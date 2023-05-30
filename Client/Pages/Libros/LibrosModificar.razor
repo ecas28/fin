@@ -1,0 +1,48 @@
+﻿@page "/libros/modificar/{Id:int}"
+@using fin.Shared.Modelo;
+
+@inject HttpClient http
+@inject NavigationManager navegar
+
+<h4>Modificar información del libro</h4>
+
+<EditForm Model="elLibro" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="row mb-3">
+        <label for="txtLibro" class="col-2 col-form-label">Nombre del libro</label>
+        <InputText class="form-control" id="txtLibro" @bind-Value="elLibro.Nombrelibro" />
+        <ValidationMessage For="(()=>elLibro.Nombrelibro)" />
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtAutor" class="col-2 col-form-label">Autor del libro</label>
+        <InputText class="form-control" id="txtAutor" @bind-Value="elLibro.Autorlibro" />
+        <ValidationMessage For="(()=>elLibro.Autorlibro)" />
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtFecha" class="col-2 col-form-label">Fecha de publicación del libro</label>
+        <InputText class="form-control" id="txtFecha" @bind-Value="elLibro.Fechapublicacion" />
+        <ValidationMessage For="(()=>elLibro.Fechapublicacion)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Libro elLibro = new Libro();
+
+    protected override async Task OnInitializedAsync()
+    {
+        elLibro = await http.GetFromJsonAsync<Libro>($"api/libros/{Id}");
+    }
+
+    private async void Guardar()
+    {
+        await http.PutAsJsonAsync($"api/libros/{Id}", elLibro);
+        navegar.NavigateTo("/libros");
+    }
+
+}

@@ -1,0 +1,39 @@
+﻿@page "/clientes/nueva"
+@using fin.Shared.Modelo;
+@inject HttpClient http
+@inject NavigationManager navegar
+
+<h3>Añadir clientes nuevos</h3>
+
+<EditForm Model="elCliente" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="row mb-3">
+        <label for="txtNombre" class="col-2 col-form-label">Nombre del cliente</label>
+        <InputText class="form-control" id="txtNombre" @bind-Value="elCliente.NombreCliente" />
+        <ValidationMessage For="(()=>elCliente.NombreCliente)" />
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtDireccion" class="col-2 col-form-label">Dirección del cliente</label>
+        <InputText class="form-control" id="txtDireccion" @bind-Value="elCliente.Direccion" />
+        <ValidationMessage For="(()=>elCliente.Direccion)" />
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtTelefono" class="col-2 col-form-label">Teléfono del cliente</label>
+        <InputText class="form-control" id="txtTelefono" @bind-Value="elCliente.Telefono" />
+        <ValidationMessage For="(()=>elCliente.Telefono)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@code {
+    private Cliente elCliente = new Cliente();
+
+    private async void Guardar()
+    {
+        await http.PostAsJsonAsync("api/clientes", elCliente);
+        navegar.NavigateTo("/clientes");
+    }
+}

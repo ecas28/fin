@@ -1,0 +1,71 @@
+﻿@page "/libros"
+@using fin.Shared.Modelo;
+
+@inject HttpClient http
+@inject NavigationManager navegar
+
+<h4>Formulario de libros</h4>
+<button class="btn btn-primary" @onclick="Agregar"><span class="oi oi-plus"></span>Agregar libro</button>
+
+@if (losLibros == null)
+{
+    <p>Cargando datos...</p>
+}
+else if (losLibros.Count == 0)
+{
+    <p>No existen personas registradas</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Libro</th>
+                <th>Autor</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var elLibro in losLibros)
+            {
+                <tr>
+                    <td>@elLibro.Id</td>
+                    <td>@elLibro.Nombrelibro</td>
+                    <td>@elLibro.Autorlibro</td>
+                    <td>@elLibro.Fechapublicacion</td>
+                    <td>
+                        <button class="btn btn-warning" @onclick="()=>Modificar(elLibro.Id)">Modificar</button>
+                        <button class="btn btn-danger" @onclick="()=>Eliminar(elLibro)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Libro> losLibros;
+
+    protected override async Task OnInitializedAsync()
+    {
+        losLibros = await http.GetFromJsonAsync<List<Libro>>("api/libros");
+    }
+
+    private void Agregar()
+    {
+        navegar.NavigateTo("/libros/nueva");
+    }
+
+    private void Modificar(int id)
+    {
+        navegar.NavigateTo($"/libros/modificar/{id}");
+    }
+
+    private async Task Eliminar(Libro unLibro)
+    {
+        await http.DeleteAsync($"api/libros/{unLibro.Id}");
+        losLibros.Remove(unLibro);
+    }
+}

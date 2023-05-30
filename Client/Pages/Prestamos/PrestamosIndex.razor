@@ -1,0 +1,75 @@
+﻿@page "/prestamos"
+@using fin.Shared.Modelo;
+@inject HttpClient http
+@inject NavigationManager navegar
+
+<h3>Formulario de prestamos</h3>
+<button class="btn btn-primary" @onclick="Agregar"><span class="oi oi-plus"></span>Agregar prestamo</button>
+
+@if (losPrestamos == null)
+{
+    <p>Cargando datos...</p>
+}
+else if (losPrestamos.Count == 0)
+{
+    <p>No existen personas registradas</p>
+}
+else
+
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ID Cliente</th>
+                <th>ID Libros</th>
+                <th>Fecha de inicio del prestamo</th>
+                <th>Fecha de vencimiento del prestamo</th>
+                <th>Fecha de devolución</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var elPrestamo in losPrestamos)
+            {
+                <tr>
+                    <td>@elPrestamo.Id</td>
+                    <td>@elPrestamo.ClienteId</td>
+                    <td>@elPrestamo.LibroId</td>
+                    <td>@elPrestamo.Inicioprestamo</td>
+                    <td>@elPrestamo.Vencimientoprestamo</td>
+                    <td>@elPrestamo.Fechadevolucion</td>
+                    <td>
+                        <button class="btn btn-warning" @onclick="()=>Modificar(elPrestamo.Id)">Modificar</button>
+                        <button class="btn btn-danger" @onclick="()=>Eliminar(elPrestamo)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Prestamos> losPrestamos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        losPrestamos = await http.GetFromJsonAsync<List<Prestamos>>("api/prestamos");
+    }
+
+    private void Agregar()
+    {
+        navegar.NavigateTo("/prestamos/nueva");
+    }
+
+    private void Modificar(int id)
+    {
+        navegar.NavigateTo($"/prestamos/modificar/{id}");
+    }
+
+    private async Task Eliminar(Prestamos unPrestamo)
+    {
+        await http.DeleteAsync($"api/prestamos/{unPrestamo.Id}");
+        losPrestamos.Remove(unPrestamo);
+    }
+}

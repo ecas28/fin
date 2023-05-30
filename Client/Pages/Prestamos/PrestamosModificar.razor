@@ -1,0 +1,47 @@
+﻿@page "/prestamos/modificar/{Id:int}"
+@using fin.Shared.Modelo;
+@inject HttpClient http
+@inject NavigationManager navegar
+
+<h3>Modificar información de los prestamos</h3>
+
+<EditForm Model="elPrestamo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="row mb-3">
+        <label for="txtInicio" class="col-2 col-form-label">Fecha de inicio del prestamo</label>
+        <InputDate class="form-control" id="txtInicio" @bind-Value="elPrestamo.Inicioprestamo" />
+        <ValidationMessage For="(()=>elPrestamo.Inicioprestamo)" />
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtVencimiento" class="col-2 col-form-label">Fecha de vencimiento del prestamo</label>
+        <InputDate class="form-control" id="txtVencimiento" @bind-Value="elPrestamo.Vencimientoprestamo" />
+        <ValidationMessage For="(()=>elPrestamo.Vencimientoprestamo)" />
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtDevolucion" class="col-2 col-form-label">Fecha de devolución del prestamo</label>
+        <InputDate class="form-control" id="txtDevolucion" @bind-Value="elPrestamo.Fechadevolucion" />
+        <ValidationMessage For="(()=>elPrestamo.Fechadevolucion)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Prestamos elPrestamo = new Prestamos();
+
+    protected override async Task OnInitializedAsync()
+    {
+        elPrestamo = await http.GetFromJsonAsync<Prestamos>($"api/prestamos/{Id}");
+    }
+
+    private async void Guardar()
+    {
+        await http.PutAsJsonAsync($"api/prestamos/{Id}", elPrestamo);
+        navegar.NavigateTo("/prestamos");
+    }
+
+}
